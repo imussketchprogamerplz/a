@@ -3,12 +3,12 @@
        {
          "key": "ikaka",
          "expiretime": "2025-07-22",
-         "player": "doughkingofdarkness"
+         "player": "DoughKingofdarkness"
        },
        {
          "key": "anotherkey",
          "expiretime": "2023-12-31",
-         "player": "doughkingofdarkness"
+         "player": "DoughKingofdarkness"
        }
      ]
    }
