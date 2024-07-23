@@ -5,10 +5,15 @@ local accountId = 42762
 local allowPassThrough = false
 local allowKeyRedeeming = false
 local useDataModel = false
-local localPlayerId = game:GetService("Players").LocalPlayer.UserId
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local localPlayerId = Players.LocalPlayer.UserId
 local rateLimit = false
 local rateLimitCountdown = 0
 local errorWait = false
+
+local folderName = "LamelaHub"
+local fileName = "key.txt"
 
 -- Function to fetch whitelist link
 local function getLink()
@@ -25,104 +30,104 @@ local function onMessage(message)
     })
 end
 
+-- Function to save the key to Workspace
+local function saveKeyToWorkspace(key)
+    local folder = Workspace:FindFirstChild(folderName) or Instance.new("Folder", Workspace)
+    folder.Name = folderName
+
+    local keyFile = folder:FindFirstChild(fileName) or Instance.new("StringValue", folder)
+    keyFile.Name = fileName
+    keyFile.Value = key
+end
+
+-- Function to load the key from Workspace
+local function loadKeyFromWorkspace()
+    local folder = Workspace:FindFirstChild(folderName)
+    if folder then
+        local keyFile = folder:FindFirstChild(fileName)
+        if keyFile then
+            return keyFile.Value
+        end
+    end
+    return nil
+end
+
+-- Function to verify the key
 local function verify(key)
     if errorWait or rateLimit then
+        onMessage("You are currently rate-limited or an error occurred. Please wait before trying again.")
         return false
     end
 
     onMessage("Checking key...")
+local url = string.format("https://api-gateway.platoboost.com/v1/public/whitelist/%i/%i?key=%s", accountId, localPlayerId, key)
 
-    if (useDataModel) then
-        local status, result = pcall(function()
-            return game:HttpGetAsync(string.format("https://api-gateway.platoboost.com/v1/public/whitelist/%i/%i?key=%s", accountId, localPlayerId, key))
-        end)
+    local function handleResult(resultBody)
+        if string.find(resultBody, "true") then
+            onMessage("Successfully whitelisted key!")
+            saveKeyToWorkspace(key)
+            return true
+        elseif string.find(resultBody, "false") then
+            if allowKeyRedeeming then
+                local redeemUrl = string.format("https://api-gateway.platoboost.com/v1/authenticators/redeem/%i/%i/%s", accountId, localPlayerId, key)
+                local redeemResult = request({
+                    Url = redeemUrl,
+                    Method = "POST"
+                })
 
-        if status then
-            if string.find(result, "true") then
-                onMessage("Successfully whitelisted!")
-                return true
-            elseif string.find(result, "false") then
-                if allowKeyRedeeming then
-                    local status1, result1 = pcall(function()
-                        return game:HttpPostAsync(string.format("https://api-gateway.platoboost.com/v1/authenticators/redeem/%i/%i/%s", accountId, localPlayerId, key), {})
-                    end)
-
-                    if status1 then
-                        if string.find(result1, "true") then
-                            onMessage("Successfully redeemed key!")
-                            return
-true
-                        end
-end
+                if redeemResult.StatusCode == 200 and string.find(redeemResult.Body, "true") then
+                    onMessage("Successfully redeemed key!")
+                    saveKeyToWorkspace(key)
+                    return true
                 end
             end
-            onMessage("Key is invalid!")
+        end
+        onMessage("Key is invalid!")
+        return false
+    end
+
+    local status, result = pcall(function()
+        return useDataModel and game:HttpGetAsync(url) or request({
+            Url = url,
+            Method = "GET"
+        })
+    end)
+
+    if status then
+        if useDataModel or result.StatusCode == 200 then
+            return handleResult(result.Body)
+        elseif result.StatusCode == 204 then
+            onMessage("Account wasn't found, check accountId")
             return false
+        elseif result.StatusCode == 429 then
+            if not rateLimit then
+                rateLimit = true
+                rateLimitCountdown = 10
+                task.spawn(function()
+                    while rateLimit do
+                        onMessage(string.format("You are being rate-limited, please slow down. Try again in %i second(s).", rateLimitCountdown))
+                        task.wait(1)
+                        rateLimitCountdown = rateLimitCountdown - 1
+if rateLimitCountdown < 0 then
+                            rateLimit = false
+                            rateLimitCountdown = 0
+                            onMessage("Rate limit is over, please try again.")
+                        end
+                    end
+                end)
+            end
         else
-            onMessage("An error occurred while contacting the server!")
             return allowPassThrough
         end
     else
-        local status, result = pcall(function()
-            return request({
-                Url = string.format("https://api-gateway.platoboost.com/v1/public/whitelist/%i/%i?key=%s", accountId, localPlayerId, key),
-                Method = "GET"
-            })
-        end)
-
-        if status then
-            if result.StatusCode == 200 then
-                if string.find(result.Body, "true") then
-                    onMessage("Successfully whitelisted key!")
-                    return true
-                else
-                    if (allowKeyRedeeming) then
-                        local status1, result1 = pcall(function()
-                            return request({
-                                Url = string.format("https://api-gateway.platoboost.com/v1/authenticators/redeem/%i/%i/%s", accountId, localPlayerId, key),
-                                Method = "POST"
-                            })
-                        end)
-
-                        if status1 then
-                            if result1.StatusCode == 200 then
-                                if string.find(result1.Body, "true") then
-                                    onMessage("Successfully redeemed key!")
-                                    return true
-                                end
-                            end
-                        end
-                    end
-                    return false
-                end
-            elseif result.StatusCode == 204 then
-                onMessage("Account wasn't found, check accountId")
-                return false
-            elseif result.StatusCode == 429 then
-                if not rateLimit then
-rateLimit = true
-                    rateLimitCountdown = 10
-task.spawn(function()
-                        while rateLimit do
-                            onMessage(string.format("You are being rate-limited, please slow down. Try again in %i second(s).", rateLimitCountdown))
-                            task.wait(1)
-                            rateLimitCountdown = rateLimitCountdown - 1
-                            if rateLimitCountdown < 0 then
-                                rateLimit = false
-                                rateLimitCountdown = 0
-                                onMessage("Rate limit is over, please try again.")
-                            end
-                        end
-                    end)
-                end
-            else
-                return allowPassThrough
-            end
-        else
-            return allowPassThrough
-        end
+        onMessage("An error occurred while contacting the server!")
+        return allowPassThrough
     end
+    return false
 end
+
+-- Load key from Workspace at the start
+getgenv().key = loadKeyFromWorkspace()
 
 -- GUI Setup
 local Tab = Window:MakeTab({
@@ -139,6 +144,12 @@ Tab:AddTextbox({
         local isVerified = verify(value)
         if isVerified then
             onMessage("Access Granted!")
+
+            -- Destroy Orion UI
+            OrionLib:Destroy()
+
+            -- Load the external script
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/doughkingofdarkness/d/main/script.lua"))()
         else
             onMessage("Access Denied!")
         end
@@ -153,5 +164,19 @@ Tab:AddButton({
         setclipboard(link)  -- This will copy the link to the user's clipboard
     end
 })
+
+if getgenv().key then
+    onMessage("Key found in Workspace, verifying...")
+    local isVerified = verify(getgenv().key)
+    if isVerified then
+        -- Destroy Orion UI
+        OrionLib:Destroy()
+
+        -- Load the external script
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/doughkingofdarkness/d/main/script.lua"))()
+    end
+else
+    onMessage("No key found in Workspace, please enter a key.")
+end
 
 OrionLib:Init()
